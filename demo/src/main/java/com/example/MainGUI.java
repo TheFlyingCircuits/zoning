@@ -27,7 +27,7 @@ public class MainGUI {
     public static int fieldHeightPixels;
 
     /** A record that represents the x and y pixel positions on base gui of top left and bottom right pixel of a rectangle */
-    public record Rectangle(int x1, int y1, int x2, int y2) {}
+    public record Rectangle(int originX, int originY, int xWidth, int yHeight) {}
     
 
     public MainGUI() {
@@ -53,62 +53,12 @@ public class MainGUI {
         fieldMaxPoint = new Point(fieldWidthPixels, fieldHeightPixels);
         frame.getLayeredPane().add(imageLabel, JLayeredPane.DEFAULT_LAYER);
 
-        JPanel box = new JPanel();
-
-        box.setBackground(new Color(52, 152, 219, 200));
-        box.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
-        // box.setPreferredSize(new Dimension(100, 100));
-        box.setBounds(200,400,100, 100);
-
-        MouseAdapter mouseHandler = new MouseAdapter() {
-            private int initialX;
-            private int initialY;
-
-            private Point initialClick;
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-                initialClick = e.getPoint();
-            }
-
-            @Override
-            public void mouseDragged(MouseEvent e) {
-                Component component = e.getComponent();
-                Point currentLocation = component.getLocation();
-                
-                int newX = currentLocation.x + e.getX() - initialClick.x;
-                int newY = currentLocation.y + e.getY() - initialClick.y;
-                
-                component.setLocation(getClamppedPointToField(new Rectangle(newX, newY, newX+100, newY+100)));
-                // System.out.println(getClamppedPointToField(new Point(newX, newY), new Point(newX+200, newY+400)).getY());
-                // System.out.println(newY+400);
-            }
-        };
-
-
-        box.addMouseListener(mouseHandler);
-        box.addMouseMotionListener(mouseHandler);
-
-        frame.getLayeredPane().add(box, JLayeredPane.PALETTE_LAYER);
+        DraggableRectagle box = new DraggableRectagle(new Rectangle(0, 0, 100, 100), new Color(52, 152, 219, 200));
+        frame.getLayeredPane().add(box.panel, JLayeredPane.PALETTE_LAYER);
         
         frame.getLayeredPane().revalidate();
         frame.getLayeredPane().repaint();
 
-    }
-
-    /**
-     * @return Returns the top right position of the rectagle clamped to be in the field
-     */
-    public Point getClamppedPointToField(Rectangle rectagle) {
-        Point output = new Point(rectagle.x1(), rectagle.y1());
-
-        if(rectagle.x1() < fieldMinPoint.getX()) output.x = (int)fieldMinPoint.getX();
-        if(rectagle.y1() < fieldMinPoint.getY()) output.y = (int)fieldMinPoint.getY();
-
-        if(rectagle.x2() > fieldMaxPoint.getX()) output.x = (int)(fieldMaxPoint.getX() - (rectagle.x2()-rectagle.x1()));
-        if(rectagle.y2() > fieldMaxPoint.getY()) output.y = (int)(fieldMaxPoint.getY() - (rectagle.y2()-rectagle.y1()));
-
-        return output;
     }
 
 }
